@@ -16,8 +16,19 @@ import chrishat
 import traceback
 import cv2
 import numpy as np
+import gufeng
 
 class Handle(object):
+    welcome = ('感谢关注！\n1.直接发送消息即可调戏机器人\n'
+               '2.表情包制作：回复helpmake查看\n'
+               '3.头像圣诞帽：回复helphat查看详情\n'
+               '4.古风歌词制作：发送gufeng随机生成古风歌词\n'
+               '5.后台代码已经托管到GitHub，回复\"code\"查看项目\n'
+               '6.公众号有很多有趣的推送，欢迎查看历史消息!\n'
+               '7.您可随时回复menu查看此消息\n'
+               '----------------\n'
+               '有任何建议或者商业合作，可直接向后台发送消息，'
+               '或者联系mail.shazi@foxmail.com')
     def POST(self):
         try:
         #if True:
@@ -66,15 +77,7 @@ class Handle(object):
                     event = recMsg.Event
                     if event == 'subscribe': #如果是关注
                         print("有人关注了！")
-                        content = ('感谢关注！\n1.直接发送消息即可调戏机器人\n'
-                                   '2.表情包制作：回复helpmake查看\n'
-                                   '3.后台代码已经托管到GitHub，回复\"code\"查看项目\n'
-                                   '4.公众号有很多有趣的推送，欢迎查看历史消息!\n'
-                                   '5.您可随时回复menu查看此消息\n'
-                                   '----------------\n'
-                                   '有任何建议或者商业合作，可直接向后台发送消息，'
-                                   '或者联系mail.shazi@foxmail.com')
-                        replyMsg = reply.TextMsg(openid, me, content)
+                        replyMsg = reply.TextMsg(openid, me, welcome)
                         return replyMsg.send()
                     return "success"
 
@@ -163,14 +166,10 @@ class Handle(object):
         if txt == 'code':
             return '项目地址：https://github.com/jcq15/wechatDevelop'
         if txt == 'menu':
-            return ('感谢关注！\n1.直接发送消息即可调戏机器人\n'
-                   '2.表情包制作：回复helpmake查看\n'
-                   '3.后台代码已经托管到GitHub，回复\"code\"查看项目\n'
-                   '4.公众号有很多有趣的推送，欢迎查看历史消息!\n'
-                   '5.您可随时回复menu查看此消息\n'
-                   '----------------\n'
-                   '有任何建议或者商业合作，可直接向后台发送消息，'
-                   '或者联系mail.shazi@foxmail.com')
-        
+            return welcome
+        if txt == 'helphat':
+            return '直接发送图片即可制作，但必须有人脸。做完之后点击链接，再点下面的“访问原网页”。如果打开一片空白，说明没检测到人脸。'
+        if txt == 'gufeng':
+            return gufeng.getSentence(10)        
         # 不是关键词，发送到图灵
         return turing.my_post(txt)
