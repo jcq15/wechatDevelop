@@ -77,7 +77,7 @@ class Handle(object):
                     event = recMsg.Event
                     if event == 'subscribe': #如果是关注
                         print("有人关注了！")
-                        replyMsg = reply.TextMsg(openid, me, welcome)
+                        replyMsg = reply.TextMsg(openid, me, Handle.welcome)
                         return replyMsg.send()
                     return "success"
 
@@ -145,9 +145,7 @@ class Handle(object):
 
         if 200 == response.status_code:
             res = bytes.decode(response.content)
-            r = ('制作成功！打开后点击下面的“访问原网页”或者复制链接用浏览器打开即可！\n'
-                 '感谢GitHub用户xtyxtyx提供的API\n'
-                 'https://sorry.xuty.tk') + res
+            r = ('制作成功！打开后点击下面的“访问原网页”或者复制链接用浏览器打开即可！\nhttps://sorry.xuty.tk') + res
             return r
         else:
             return "API出现异常，请联系我查看情况！\nmail.shazi@foxmail.com"
@@ -166,7 +164,7 @@ class Handle(object):
         if txt == 'code':
             return '项目地址：https://github.com/jcq15/wechatDevelop'
         if txt == 'menu':
-            return welcome
+            return Handle.welcome
         if txt == 'helphat':
             return '直接发送图片即可制作，但必须有人脸。做完之后点击链接，再点下面的“访问原网页”。如果打开一片空白，说明没检测到人脸。'
         if txt == 'gufeng':
