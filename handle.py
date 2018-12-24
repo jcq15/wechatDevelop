@@ -6,8 +6,16 @@ import web
 import reply
 import receive
 import turing
-import requests, json
+import requests
+import json
 import passwd           #各种token
+#from PIL import Image
+#from io import BytesIO
+import time
+import chrishat
+import traceback
+import cv2
+import numpy as np
 
 class Handle(object):
     def POST(self):
@@ -19,6 +27,7 @@ class Handle(object):
             if isinstance(recMsg, receive.Msg):
                 openid = recMsg.FromUserName    #用户
                 me = recMsg.ToUserName          #我
+                # 文本消息
                 if recMsg.MsgType == 'text':
                     #如果是文本消息
                     receive_content = recMsg.Content.decode() #消息内容
@@ -32,6 +41,27 @@ class Handle(object):
                     
                     return replyMsg.send()
                 
+                # 图片
+                if recMsg.MsgType == 'image':
+                    pic_url = recMsg.PicUrl + '.jpg'
+                    response = requests.get(pic_url)
+                    image = np.asarray(bytearray(response.content), dtype="uint8")  
+                    img = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+                    # 读帽子图，做
+                    hat_img = cv2.imread("chris/hat.png",-1)
+                    output = chrishat.add_hat(img, hat_img)
+                    
+                    # 存
+                    timename = time.strftime("%Y%m%d%H%M%S", time.localtime())
+                    cv2.imwrite("/assets/image/"+timename+".png", output)
+                    cv2.destroyAllWindows()
+
+                    send_content = r'http://47.95.245.218:2000/' + timename + '.png'
+                    replyMsg = reply.TextMsg(openid, me, send_content)
+                    return replyMsg.send()
+                
+                # 事件
                 if recMsg.MsgType == 'event':
                     event = recMsg.Event
                     if event == 'subscribe': #如果是关注
@@ -46,13 +76,15 @@ class Handle(object):
                                    '或者联系mail.shazi@foxmail.com')
                         replyMsg = reply.TextMsg(openid, me, content)
                         return replyMsg.send()
+                    return "success"
 
                 else:
                     print("啥玩意啊")
             return "success" #微信爸爸要求回复success，否则不依不饶
 
         except Exception as Argment:
-            return Argment
+            print(traceback.format_exc())
+            return "success"
 
     # 一开始验证用
     def GET(self):
