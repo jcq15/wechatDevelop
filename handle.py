@@ -5,7 +5,6 @@ import hashlib
 import web
 import reply
 import receive
-import turing
 import requests
 import json
 import passwd           #各种token
@@ -16,6 +15,7 @@ import cv2
 import numpy as np
 import gufeng
 import newyear
+from urllib import parse
 
 class Handle(object):
     welcome = ('感谢关注！\n0.发送help2019查看2019年会发生的事\n'
@@ -41,7 +41,7 @@ class Handle(object):
                     #如果是文本消息
                     receive_content = recMsg.Content.decode() #消息内容
 
-                    # 关键词检验
+                    # 文本处理
                     send_content = self.dealText(receive_content)
                     
                     print("\nreceive: ", receive_content, '\nsend: ', send_content)
@@ -150,6 +150,13 @@ class Handle(object):
         else:
             return "API出现异常，请联系我查看情况！\nmail.shazi@foxmail.com"
 
+    # 机器人
+    def robot(self, txt):
+        url = 'http://api.qingyunke.com/api.php?key=free&appid=0&msg=%s' % txt
+        response = requests.post(url=url)
+        res_dic = json.loads(response.content.decode('utf-8'))
+        return res_dic['content']
+
     # 处理文本，先检查是否是关键词，不是就发送到图灵
     def dealText(self, txt):
         if len(txt) >= 4 and txt[0:4] == 'make':
@@ -173,5 +180,5 @@ class Handle(object):
             return newyear.makeNewYear(txt)
         if txt == 'help2019':
             return '发送“2019+你的名字”，例如“2019李华”，打开后点击下面的“访问原网页”保存即可！'
-        # 不是关键词，发送到图灵
-        return turing.my_post(txt)
+        # 不是关键词，发送到机器人
+        return self.robot(txt)
