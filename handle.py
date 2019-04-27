@@ -9,26 +9,24 @@ import turing
 import requests
 import json
 import passwd           #各种token
-#from PIL import Image
-#from io import BytesIO
 import time
 import chrishat
 import traceback
 import cv2
 import numpy as np
 import gufeng
+import newyear
 
 class Handle(object):
-    welcome = ('感谢关注！\n1.直接发送消息即可调戏机器人\n'
+    welcome = ('感谢关注！\n0.发送help2019查看2019年会发生的事\n'
+               '1.直接发送消息即可调戏机器人\n'
                '2.表情包制作：回复helpmake查看\n'
-               '3.头像圣诞帽：回复helphat查看详情\n'
-               '4.古风歌词制作：发送gufeng随机生成古风歌词\n'
-               '5.后台代码已经托管到GitHub，回复\"code\"查看项目\n'
-               '6.公众号有很多有趣的推送，欢迎查看历史消息!\n'
-               '7.您可随时回复menu查看此消息\n'
+               '3.古风歌词制作：发送gufeng随机生成古风歌词\n'
+               '4.后台代码已经托管到GitHub，回复\"code\"查看项目\n'
+               '5.公众号有很多有趣的推送，欢迎查看历史消息!\n'
+               '6.您可随时回复menu查看此消息\n'
                '----------------\n'
-               '有任何建议或者商业合作，可直接向后台发送消息，'
-               '或者联系mail.shazi@foxmail.com')
+               '商业合作请联系mail.shazi@foxmail.com')
     def POST(self):
         try:
         #if True:
@@ -54,6 +52,8 @@ class Handle(object):
                 
                 # 图片
                 if recMsg.MsgType == 'image':
+                    return success
+                    '''
                     pic_url = recMsg.PicUrl + '.jpg'
                     response = requests.get(pic_url)
                     image = np.asarray(bytearray(response.content), dtype="uint8")  
@@ -68,9 +68,9 @@ class Handle(object):
                     cv2.imwrite("/assets/image/"+timename+".png", output)
                     cv2.destroyAllWindows()
 
-                    send_content = r'http://47.95.245.218:2000/' + timename + '.png'
                     replyMsg = reply.TextMsg(openid, me, send_content)
                     return replyMsg.send()
+                    '''
                 
                 # 事件
                 if recMsg.MsgType == 'event':
@@ -165,9 +165,13 @@ class Handle(object):
             return '项目地址：https://github.com/jcq15/wechatDevelop'
         if txt == 'menu':
             return Handle.welcome
-        if txt == 'helphat':
-            return '直接发送图片即可制作，但必须有人脸。做完之后点击链接，再点下面的“访问原网页”。如果打开一片空白，说明没检测到人脸。'
+        #if txt == 'helphat':
+        #    return '直接发送图片即可制作，但必须有人脸。做完之后点击链接，再点下面的“访问原网页”。如果打开一片空白，说明没检测到人脸。'
         if txt == 'gufeng':
-            return gufeng.getSentence(10)        
+            return gufeng.getSentence(10)   
+        if len(txt) >= 4 and txt[0:4] == '2019':
+            return newyear.makeNewYear(txt)
+        if txt == 'help2019':
+            return '发送“2019+你的名字”，例如“2019李华”，打开后点击下面的“访问原网页”保存即可！'
         # 不是关键词，发送到图灵
         return turing.my_post(txt)
